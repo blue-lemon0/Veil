@@ -50,4 +50,34 @@
     <string name="action_import">确认导入</string>
     <string name="action_pick_source">选择来源</string>
     <string name="label_existing">已有</string>
+
+    <string name="section_habit_laws">习惯回路</string>
+
+    <string name="tab_build_habit">养成</string>
+    <string name="tab_break_habit">戒除</string>
+
+    <string name="label_cue">提示</string>
+    <string name="label_craving">渴求</string>
+    <string name="label_response">反应</string>
+    <string name="label_reward">奖励</string>
+
+    <string name="hint_cue">我怎样才能让它显而易见？</string>
+    <string name="hint_craving">我怎样才能让它有吸引力？</string>
+    <string name="hint_response">我怎样才能让它简便易行？</string>
+    <string name="hint_reward">我怎样才能让它令人愉悦？</string>
+
+    <string name="hint_bad_cue">我怎样才能让它无从显现？</string>
+    <string name="hint_bad_craving">我怎样才能让它缺乏吸引力？</string>
+    <string name="hint_bad_response">我怎样才能让它难以施行？</string>
+    <string name="hint_bad_reward">我怎样才能让它令人厌烦？</string>
+
+    <string name="placeholder_cue">放显眼处 / 设提醒</string>
+    <string name="placeholder_craving">绑喜好 / 找同伴</string>
+    <string name="placeholder_response">从最小动作开始</string>
+    <string name="placeholder_reward">完成后即时奖励</string>
+
+    <string name="placeholder_bad_cue">移除提示 / 藏起来</string>
+    <string name="placeholder_bad_craving">强化负面感受</string>
+    <string name="placeholder_bad_response">增加操作步骤</string>
+    <string name="placeholder_bad_reward">设置即时惩罚</string>
 </resources>

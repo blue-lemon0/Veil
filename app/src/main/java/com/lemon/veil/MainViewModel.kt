@@ -320,6 +320,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun saveHabitDesign(
+        noteId: Long,
+        cue: String, craving: String, responsePlan: String, reward: String,
+        badCue: String, badCraving: String, badResponsePlan: String, badReward: String
+    ) {
+        viewModelScope.launch {
+            noteRepository.updateHabitDesign(noteId, cue, craving, responsePlan, reward, badCue, badCraving, badResponsePlan, badReward)
+        }
+    }
+
     fun quickCreate(action: String, time: Long?, location: String) {
         viewModelScope.launch {
             val note = NoteEntity(originalText = action, suggestion = action, finalAction = action, location = location, time = time)

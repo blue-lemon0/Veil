@@ -24,7 +24,15 @@ data class NoteEntity(
     val orderIndex: Int = 0,
     val parentId: Long? = null,
     val stepOrder: Int = 0,
-    val currentStepIndex: Int = 0
+    val currentStepIndex: Int = 0,
+    val cue: String = "",
+    val craving: String = "",
+    val responsePlan: String = "",
+    val reward: String = "",
+    val badCue: String = "",
+    val badCraving: String = "",
+    val badResponsePlan: String = "",
+    val badReward: String = ""
 ) {
     @Ignore
     var steps: List<NoteEntity> = emptyList()

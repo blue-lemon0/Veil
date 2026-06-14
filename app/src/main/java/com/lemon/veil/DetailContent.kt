@@ -77,9 +77,13 @@ fun DetailContent(
     steps: List<NoteEntity>,
     isEditingMain: Boolean,
     isEditingSteps: Boolean,
+    isEditingDesign: Boolean,
     onEditMainClick: () -> Unit,
     onEditStepsClick: () -> Unit,
+    onEditDesignClick: () -> Unit,
     onSaveMain: (action: String, time: Long?, location: String) -> Unit,
+    onSaveHabitDesign: (cue: String, craving: String, responsePlan: String, reward: String,
+                        badCue: String, badCraving: String, badResponsePlan: String, badReward: String) -> Unit,
     onSyncToggle: (Boolean) -> Unit,
     onAlarmToggle: (Boolean) -> Unit,
     onImportClick: () -> Unit,
@@ -89,6 +93,15 @@ fun DetailContent(
     var locationText by remember(note.id) { mutableStateOf(note.location) }
     var selectedTime by remember(note.id) { mutableStateOf(note.time) }
     var showActionError by remember { mutableStateOf(false) }
+
+    var cue by remember(note.id) { mutableStateOf(note.cue) }
+    var craving by remember(note.id) { mutableStateOf(note.craving) }
+    var responsePlan by remember(note.id) { mutableStateOf(note.responsePlan) }
+    var reward by remember(note.id) { mutableStateOf(note.reward) }
+    var badCue by remember(note.id) { mutableStateOf(note.badCue) }
+    var badCraving by remember(note.id) { mutableStateOf(note.badCraving) }
+    var badResponsePlan by remember(note.id) { mutableStateOf(note.badResponsePlan) }
+    var badReward by remember(note.id) { mutableStateOf(note.badReward) }
 
     val status = noteTimeStatus(note, null)
 
@@ -145,6 +158,38 @@ fun DetailContent(
             onTimeClick = { pickerState.pick(null) },
             location = locationText,
             onLocationChange = { locationText = it },
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        HabitDesignCard(
+            cue = cue,
+            craving = craving,
+            responsePlan = responsePlan,
+            reward = reward,
+            badCue = badCue,
+            badCraving = badCraving,
+            badResponsePlan = badResponsePlan,
+            badReward = badReward,
+            isEditing = isEditingDesign,
+            onToggleEdit = {
+                if (isEditingDesign) {
+                    onSaveHabitDesign(cue, craving, responsePlan, reward, badCue, badCraving, badResponsePlan, badReward)
+                }
+                onEditDesignClick()
+            },
+            onFieldChanged = { field, value ->
+                when (field) {
+                    "cue" -> cue = value
+                    "craving" -> craving = value
+                    "responsePlan" -> responsePlan = value
+                    "reward" -> reward = value
+                    "badCue" -> badCue = value
+                    "badCraving" -> badCraving = value
+                    "badResponsePlan" -> badResponsePlan = value
+                    "badReward" -> badReward = value
+                }
+            },
         )
 
         Spacer(Modifier.height(12.dp))

@@ -100,6 +100,10 @@ private fun DetailRoute(
             viewModel.updateTime(note.id, time)
             viewModel.updateLocation(note.id, location)
         },
+        onSaveHabitDesign = { cue, craving, responsePlan, reward,
+            badCue, badCraving, badResponsePlan, badReward ->
+            viewModel.saveHabitDesign(note.id, cue, craving, responsePlan, reward, badCue, badCraving, badResponsePlan, badReward)
+        },
         onSyncToggle = { if (it) viewModel.syncCal(note) else viewModel.removeCal(note) },
         onAlarmToggle = { viewModel.toggleAlarm(note) },
         onImportClick = { onOpenImport(note.id) },

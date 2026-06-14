@@ -26,6 +26,11 @@ interface NoteRepository {
     suspend fun mergeNotes(noteIds: List<Long>, newTitle: String): Long
     suspend fun setAsSubTasks(noteIds: List<Long>, targetId: Long)
     suspend fun promoteToRoot(noteIds: List<Long>)
+    suspend fun updateHabitDesign(
+        noteId: Long,
+        cue: String, craving: String, responsePlan: String, reward: String,
+        badCue: String, badCraving: String, badResponsePlan: String, badReward: String
+    )
 }
 
 class NoteRepositoryImpl(context: Context) : NoteRepository {
@@ -56,4 +61,9 @@ class NoteRepositoryImpl(context: Context) : NoteRepository {
     override suspend fun mergeNotes(noteIds: List<Long>, newTitle: String): Long = dao.mergeNotes(noteIds, newTitle)
     override suspend fun setAsSubTasks(noteIds: List<Long>, targetId: Long) = dao.setAsSubTasks(noteIds, targetId)
     override suspend fun promoteToRoot(noteIds: List<Long>) = dao.promoteToRoot(noteIds)
+    override suspend fun updateHabitDesign(
+        noteId: Long,
+        cue: String, craving: String, responsePlan: String, reward: String,
+        badCue: String, badCraving: String, badResponsePlan: String, badReward: String
+    ) = dao.updateHabitDesign(noteId, cue, craving, responsePlan, reward, badCue, badCraving, badResponsePlan, badReward)
 }

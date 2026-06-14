@@ -42,6 +42,8 @@ fun DetailScreen(
     onBack: () -> Unit,
     onDelete: (NoteEntity) -> Unit,
     onSaveMain: (action: String, time: Long?, location: String) -> Unit,
+    onSaveHabitDesign: (cue: String, craving: String, responsePlan: String, reward: String,
+                        badCue: String, badCraving: String, badResponsePlan: String, badReward: String) -> Unit,
     onSyncToggle: (Boolean) -> Unit,
     onAlarmToggle: (Boolean) -> Unit,
     onImportClick: () -> Unit,
@@ -50,8 +52,9 @@ fun DetailScreen(
 ) {
     var isEditingMain by remember { mutableStateOf(false) }
     var isEditingSteps by remember { mutableStateOf(false) }
-    val isEditing = isEditingMain || isEditingSteps
-    val onExitEdit by rememberUpdatedState { isEditingMain = false; isEditingSteps = false }
+    var isEditingDesign by remember { mutableStateOf(false) }
+    val isEditing = isEditingMain || isEditingSteps || isEditingDesign
+    val onExitEdit by rememberUpdatedState { isEditingMain = false; isEditingSteps = false; isEditingDesign = false }
 
     var showDeleteConfirm by remember { mutableStateOf(false) }
 
@@ -90,9 +93,12 @@ fun DetailScreen(
                 steps = steps,
                 isEditingMain = isEditingMain,
                 isEditingSteps = isEditingSteps,
+                isEditingDesign = isEditingDesign,
                 onEditMainClick = { isEditingMain = !isEditingMain },
                 onEditStepsClick = { isEditingSteps = !isEditingSteps },
+                onEditDesignClick = { isEditingDesign = !isEditingDesign },
                 onSaveMain = onSaveMain,
+                onSaveHabitDesign = onSaveHabitDesign,
                 onSyncToggle = onSyncToggle,
                 onAlarmToggle = onAlarmToggle,
                 onImportClick = onImportClick,
