@@ -53,6 +53,14 @@
 
     <string name="section_habit_laws">习惯回路</string>
 
+    <string name="section_habit_stack">习惯叠加</string>
+    <string name="label_current_habit">当前习惯</string>
+    <string name="label_new_habit">新习惯</string>
+    <string name="hint_current_habit">你每天已有的习惯是什么？</string>
+    <string name="hint_new_habit">你想叠加什么新习惯？</string>
+    <string name="placeholder_current_habit">刷牙</string>
+    <string name="placeholder_new_habit">做10个俯卧撑</string>
+
     <string name="tab_build_habit">养成</string>
     <string name="tab_break_habit">戒除</string>
 

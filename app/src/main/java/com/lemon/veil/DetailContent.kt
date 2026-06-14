@@ -78,12 +78,15 @@ fun DetailContent(
     isEditingMain: Boolean,
     isEditingSteps: Boolean,
     isEditingDesign: Boolean,
+    isEditingStack: Boolean,
     onEditMainClick: () -> Unit,
     onEditStepsClick: () -> Unit,
     onEditDesignClick: () -> Unit,
+    onEditStackClick: () -> Unit,
     onSaveMain: (action: String, time: Long?, location: String) -> Unit,
     onSaveHabitDesign: (cue: String, craving: String, responsePlan: String, reward: String,
                         badCue: String, badCraving: String, badResponsePlan: String, badReward: String) -> Unit,
+    onSaveHabitStack: (currentHabit: String, newHabit: String) -> Unit,
     onSyncToggle: (Boolean) -> Unit,
     onAlarmToggle: (Boolean) -> Unit,
     onImportClick: () -> Unit,
@@ -102,6 +105,9 @@ fun DetailContent(
     var badCraving by remember(note.id) { mutableStateOf(note.badCraving) }
     var badResponsePlan by remember(note.id) { mutableStateOf(note.badResponsePlan) }
     var badReward by remember(note.id) { mutableStateOf(note.badReward) }
+
+    var currentHabit by remember(note.id) { mutableStateOf(note.currentHabit) }
+    var newHabit by remember(note.id) { mutableStateOf(note.newHabit) }
 
     val status = noteTimeStatus(note, null)
 
@@ -158,6 +164,26 @@ fun DetailContent(
             onTimeClick = { pickerState.pick(null) },
             location = locationText,
             onLocationChange = { locationText = it },
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        HabitStackCard(
+            currentHabit = currentHabit,
+            newHabit = newHabit,
+            isEditing = isEditingStack,
+            onToggleEdit = {
+                if (isEditingStack) {
+                    onSaveHabitStack(currentHabit, newHabit)
+                }
+                onEditStackClick()
+            },
+            onFieldChanged = { field, value ->
+                when (field) {
+                    "currentHabit" -> currentHabit = value
+                    "newHabit" -> newHabit = value
+                }
+            },
         )
 
         Spacer(Modifier.height(12.dp))

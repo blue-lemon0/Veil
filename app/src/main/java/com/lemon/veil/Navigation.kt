@@ -100,6 +100,9 @@ private fun DetailRoute(
             viewModel.updateTime(note.id, time)
             viewModel.updateLocation(note.id, location)
         },
+        onSaveHabitStack = { currentHabit, newHabit ->
+            viewModel.saveHabitStack(note.id, currentHabit, newHabit)
+        },
         onSaveHabitDesign = { cue, craving, responsePlan, reward,
             badCue, badCraving, badResponsePlan, badReward ->
             viewModel.saveHabitDesign(note.id, cue, craving, responsePlan, reward, badCue, badCraving, badResponsePlan, badReward)

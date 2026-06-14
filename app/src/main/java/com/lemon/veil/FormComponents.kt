@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 fun LabelRow(
     label: String,
     modifier: Modifier = Modifier,
+    labelWidth: Int = 40,
     content: @Composable RowScope.() -> Unit
 ) {
     Row(
@@ -55,7 +56,7 @@ fun LabelRow(
             text = label,
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.width(40.dp)
+            modifier = Modifier.width(labelWidth.dp)
         )
         content()
     }

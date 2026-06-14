@@ -320,6 +320,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun saveHabitStack(noteId: Long, currentHabit: String, newHabit: String) {
+        viewModelScope.launch {
+            noteRepository.updateHabitStack(noteId, currentHabit, newHabit)
+        }
+    }
+
     fun saveHabitDesign(
         noteId: Long,
         cue: String, craving: String, responsePlan: String, reward: String,

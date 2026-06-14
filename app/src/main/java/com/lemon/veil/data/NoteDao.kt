@@ -53,6 +53,9 @@ interface NoteDao {
     @Query("UPDATE notes SET isCalendarSynced = 0 WHERE calendarEventId = :eventId")
     suspend fun clearSyncStatus(eventId: Long)
 
+    @Query("UPDATE notes SET currentHabit = :currentHabit, newHabit = :newHabit WHERE id = :noteId")
+    suspend fun updateHabitStack(noteId: Long, currentHabit: String, newHabit: String)
+
     @Query("""
         UPDATE notes SET
         cue = :cue, craving = :craving, responsePlan = :responsePlan, reward = :reward,

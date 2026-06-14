@@ -44,6 +44,7 @@ fun DetailScreen(
     onSaveMain: (action: String, time: Long?, location: String) -> Unit,
     onSaveHabitDesign: (cue: String, craving: String, responsePlan: String, reward: String,
                         badCue: String, badCraving: String, badResponsePlan: String, badReward: String) -> Unit,
+    onSaveHabitStack: (currentHabit: String, newHabit: String) -> Unit,
     onSyncToggle: (Boolean) -> Unit,
     onAlarmToggle: (Boolean) -> Unit,
     onImportClick: () -> Unit,
@@ -53,8 +54,9 @@ fun DetailScreen(
     var isEditingMain by remember { mutableStateOf(false) }
     var isEditingSteps by remember { mutableStateOf(false) }
     var isEditingDesign by remember { mutableStateOf(false) }
-    val isEditing = isEditingMain || isEditingSteps || isEditingDesign
-    val onExitEdit by rememberUpdatedState { isEditingMain = false; isEditingSteps = false; isEditingDesign = false }
+    var isEditingStack by remember { mutableStateOf(false) }
+    val isEditing = isEditingMain || isEditingSteps || isEditingDesign || isEditingStack
+    val onExitEdit by rememberUpdatedState { isEditingMain = false; isEditingSteps = false; isEditingDesign = false; isEditingStack = false }
 
     var showDeleteConfirm by remember { mutableStateOf(false) }
 
@@ -94,11 +96,14 @@ fun DetailScreen(
                 isEditingMain = isEditingMain,
                 isEditingSteps = isEditingSteps,
                 isEditingDesign = isEditingDesign,
+                isEditingStack = isEditingStack,
                 onEditMainClick = { isEditingMain = !isEditingMain },
                 onEditStepsClick = { isEditingSteps = !isEditingSteps },
                 onEditDesignClick = { isEditingDesign = !isEditingDesign },
+                onEditStackClick = { isEditingStack = !isEditingStack },
                 onSaveMain = onSaveMain,
                 onSaveHabitDesign = onSaveHabitDesign,
+                onSaveHabitStack = onSaveHabitStack,
                 onSyncToggle = onSyncToggle,
                 onAlarmToggle = onAlarmToggle,
                 onImportClick = onImportClick,

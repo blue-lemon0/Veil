@@ -32,7 +32,9 @@ data class NoteEntity(
     val badCue: String = "",
     val badCraving: String = "",
     val badResponsePlan: String = "",
-    val badReward: String = ""
+    val badReward: String = "",
+    val currentHabit: String = "",
+    val newHabit: String = ""
 ) {
     @Ignore
     var steps: List<NoteEntity> = emptyList()
