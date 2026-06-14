@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Veil</string>
+
+    <string name="title_task_detail">任务详情</string>
+    <string name="action_delete">删除</string>
+    <string name="action_cancel">取消</string>
+    <string name="action_add_step">添加步骤</string>
+    <string name="action_go_settings">去开启</string>
+    <string name="action_later">稍后再说</string>
+    <string name="cd_back">返回</string>
+    <string name="cd_delete">删除</string>
+    <string name="cd_save">保存</string>
+    <string name="cd_edit">编辑</string>
+    <string name="error_action_empty">行动不能为空</string>
+    <string name="label_action">行动</string>
+    <string name="label_time">时间</string>
+    <string name="label_location">地点</string>
+    <string name="hint_enter_action">输入行动</string>
+    <string name="hint_no_commitment">未设定承诺</string>
+    <string name="hint_not_set">未设定</string>
+    <string name="hint_set_time">设置时间</string>
+    <string name="hint_add_location">添加地点</string>
+    <string name="text_confirm_delete_title">确认删除</string>
+    <string name="text_confirm_delete_body">确定删除此任务及其所有步骤吗？此操作不可撤销。</string>
+    <string name="title_steps_progress">步骤 %1$d/%2$d</string>
+    <string name="label_alarm">提醒</string>
+    <string name="label_sync_calendar">同步到日历</string>
+    <string name="section_original_note">原始笔记</string>
+    <string name="section_ai_suggestion">AI 建议</string>
+    <string name="cd_move_up">上移</string>
+    <string name="cd_move_down">下移</string>
+    <string name="title_home">首页</string>
+    <string name="hint_search">搜索笔记</string>
+    <string name="cd_manual_input">手动输入</string>
+    <string name="title_alarm_permission">开启精确闹钟</string>
+    <string name="msg_alarm_permission">为了实现准时提醒，请在设置中允许「闹钟和提醒」权限。</string>
+    <string name="notification_title">提醒</string>
+    <string name="channel_name">日程提醒</string>
+    <string name="msg_empty_title">说句话或打个字，剩下交给我</string>
+    <string name="msg_empty_hint">点击 + 开始记录</string>
+    <string name="msg_no_results">无匹配结果</string>
+    <string name="title_import_steps">导入步骤 — %s</string>
+    <string name="label_source">来源</string>
+    <string name="label_import_mode">导入模式</string>
+    <string name="msg_preview_import">将导入 %d 项</string>
+    <string name="msg_no_selection">尚未选择任何步骤</string>
+    <string name="action_copy">复制</string>
+    <string name="action_move">移动</string>
+    <string name="action_import">确认导入</string>
+    <string name="action_pick_source">选择来源</string>
+    <string name="label_existing">已有</string>
+</resources>
