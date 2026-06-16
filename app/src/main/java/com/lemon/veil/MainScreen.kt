@@ -29,7 +29,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -47,9 +46,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.setValue
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -57,7 +61,9 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
 import com.lemon.veil.data.IdentityEntity
 import com.lemon.veil.data.NoteEntity
 
@@ -314,11 +320,13 @@ private fun IdentityFilterBar(
     onManage: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var cardWidth by remember { mutableStateOf(0.dp) }
+    var cardWidthPx by remember { mutableStateOf(0) }
     val density = LocalDensity.current
+    val animationDuration = 400
+
     val chevronRotation by animateFloatAsState(
         targetValue = if (expanded) 180f else 0f,
-        animationSpec = tween(durationMillis = 200),
+        animationSpec = tween(durationMillis = animationDuration),
     )
     val selectedName = if (selectedId == null) null
         else identities.find { it.id == selectedId }?.name
@@ -340,8 +348,11 @@ private fun IdentityFilterBar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(32.dp)
-                    .onSizeChanged { cardWidth = with(density) { it.width.toDp() } }
-                    .clickable { expanded = true },
+                    .onSizeChanged { cardWidthPx = it.width }
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                    ) { expanded = !expanded },
                 shape = RoundedCornerShape(8.dp),
             ) {
                 Row(
@@ -382,43 +393,20 @@ private fun IdentityFilterBar(
                     )
                 }
             }
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier
-                    .width(cardWidth)
-                    .background(
-                        MaterialTheme.colorScheme.surface,
-                        RoundedCornerShape(8.dp)
-                    )
-                    .border(
-                        1.dp,
-                        MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                        RoundedCornerShape(8.dp)
-                    ),
+            if (expanded) {
+                BackHandler { expanded = false }
+            }
+            Popup(
+                offset = IntOffset(0, with(density) { 36.dp.roundToPx() }),
             ) {
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            stringResource(R.string.filter_all),
-                            color = if (selectedId == null) MaterialTheme.colorScheme.primary
-                                    else MaterialTheme.colorScheme.onSurface,
-                        )
-                    },
-                    onClick = { onSelect(null); expanded = false },
+                IdentityPopupContent(
+                    expanded = expanded,
+                    cardWidthPx = cardWidthPx,
+                    selectedId = selectedId,
+                    identities = identities,
+                    animationDuration = animationDuration,
+                    onSelect = { id -> onSelect(id); expanded = false },
                 )
-                identities.forEach { identity ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                identity.name,
-                                color = if (identity.id == selectedId) MaterialTheme.colorScheme.primary
-                                        else MaterialTheme.colorScheme.onSurface,
-                            )
-                        },
-                        onClick = { onSelect(identity.id); expanded = false },
-                    )
-                }
             }
         }
         Spacer(Modifier.width(4.dp))
@@ -429,6 +417,65 @@ private fun IdentityFilterBar(
                 modifier = Modifier.size(16.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+    }
+}
+
+@Composable
+private fun IdentityPopupContent(
+    expanded: Boolean,
+    cardWidthPx: Int,
+    selectedId: Long?,
+    identities: List<IdentityEntity>,
+    animationDuration: Int,
+    onSelect: (Long?) -> Unit,
+) {
+    val density = LocalDensity.current
+    AnimatedVisibility(
+        visible = expanded,
+        modifier = Modifier
+            .width(with(density) { cardWidthPx.toDp() })
+            .background(
+                MaterialTheme.colorScheme.surface,
+                RoundedCornerShape(8.dp)
+            )
+            .border(
+                1.dp,
+                MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                RoundedCornerShape(8.dp)
+            ),
+        enter = expandVertically(
+            expandFrom = Alignment.Top,
+            animationSpec = tween(durationMillis = animationDuration, easing = LinearEasing)
+        ),
+        exit = shrinkVertically(
+            shrinkTowards = Alignment.Top,
+            animationSpec = tween(durationMillis = animationDuration, easing = LinearEasing)
+        ),
+    ) {
+        Column {
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        stringResource(R.string.filter_all),
+                        color = if (selectedId == null) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.onSurface,
+                    )
+                },
+                onClick = { onSelect(null) },
+            )
+            identities.forEach { identity ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            identity.name,
+                            color = if (identity.id == selectedId) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.onSurface,
+                        )
+                    },
+                    onClick = { onSelect(identity.id) },
+                )
+            }
         }
     }
 }
