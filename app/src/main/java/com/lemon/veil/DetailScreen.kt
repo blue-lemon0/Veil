@@ -22,6 +22,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.lemon.veil.data.IdentityEntity
 import com.lemon.veil.data.NoteEntity
 
 data class StepCallbacks(
@@ -45,6 +46,11 @@ fun DetailScreen(
     onSaveHabitDesign: (cue: String, craving: String, responsePlan: String, reward: String,
                         badCue: String, badCraving: String, badResponsePlan: String, badReward: String) -> Unit,
     onSaveHabitStack: (currentHabit: String, newHabit: String) -> Unit,
+    noteIdentities: List<IdentityEntity> = emptyList(),
+    allIdentities: List<IdentityEntity> = emptyList(),
+    onSetNoteIdentities: (List<Long>) -> Unit = {},
+    onOpenIdentityManager: () -> Unit = {},
+    onNewIdentity: (name: String, description: String) -> Unit = { _, _ -> },
     onSyncToggle: (Boolean) -> Unit,
     onAlarmToggle: (Boolean) -> Unit,
     onImportClick: () -> Unit,
@@ -104,6 +110,11 @@ fun DetailScreen(
                 onSaveMain = onSaveMain,
                 onSaveHabitDesign = onSaveHabitDesign,
                 onSaveHabitStack = onSaveHabitStack,
+                noteIdentities = noteIdentities,
+                allIdentities = allIdentities,
+                onSetNoteIdentities = onSetNoteIdentities,
+                onOpenIdentityManager = onOpenIdentityManager,
+                onNewIdentity = onNewIdentity,
                 onSyncToggle = onSyncToggle,
                 onAlarmToggle = onAlarmToggle,
                 onImportClick = onImportClick,

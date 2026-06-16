@@ -4,6 +4,7 @@
 
     <string name="title_task_detail">任务详情</string>
     <string name="action_delete">删除</string>
+    <string name="action_confirm">确定</string>
     <string name="action_cancel">取消</string>
     <string name="action_add_step">添加步骤</string>
     <string name="action_go_settings">去开启</string>
@@ -88,4 +89,21 @@
     <string name="placeholder_bad_craving">强化负面感受</string>
     <string name="placeholder_bad_response">增加操作步骤</string>
     <string name="placeholder_bad_reward">设置即时惩罚</string>
+
+    <string name="section_identities">身份</string>
+    <string name="label_identity_name">名称</string>
+    <string name="label_identity_description">描述</string>
+    <string name="hint_identity_name">例如：读者</string>
+    <string name="hint_identity_description">例如：热爱阅读、持续学习的人</string>
+    <string name="title_identity_manager">身份管理</string>
+    <string name="title_identity_picker">选择身份</string>
+    <string name="action_new_identity">新建身份</string>
+    <string name="action_edit_identity">编辑身份</string>
+    <string name="action_delete_identity">删除身份</string>
+    <string name="action_confirm_delete_identity">确定删除</string>
+    <string name="msg_delete_identity">此身份关联了 %d 个任务，删除后这些任务将失去此身份标签。</string>
+    <string name="msg_no_identity">暂无身份</string>
+    <string name="filter_all">全部</string>
+    <string name="identity_linked_tasks">关联 %d 个任务</string>
+    <string name="hint_no_identity">尚未选择身份</string>
 </resources>

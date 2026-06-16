@@ -26,6 +26,7 @@ fun AppNavigation(viewModel: MainViewModel) {
             ListScreen(
                 viewModel = viewModel,
                 onOpenDetail = { noteId -> navController.navigate("detail/$noteId") },
+                onOpenIdentityManager = { navController.navigate("identity_manager") },
             )
         }
         composable(
@@ -38,6 +39,13 @@ fun AppNavigation(viewModel: MainViewModel) {
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
                 onOpenImport = { targetId -> navController.navigate("import_preview/$targetId") },
+                onOpenIdentityManager = { navController.navigate("identity_manager") },
+            )
+        }
+        composable("identity_manager") {
+            IdentityManagerScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
             )
         }
         composable(
@@ -77,17 +85,25 @@ private fun DetailRoute(
     viewModel: MainViewModel,
     onBack: () -> Unit,
     onOpenImport: (Long) -> Unit,
+    onOpenIdentityManager: () -> Unit,
 ) {
     val notes by viewModel.notes.collectAsState()
     val stepsState by viewModel.stepsState.collectAsState()
+    val allIdentities by viewModel.allIdentities.collectAsState()
+    val noteIdentitiesMap by viewModel.noteIdentities.collectAsState()
 
     val note = remember(noteId, notes) { notes.find { it.id == noteId } }
+    val noteIdentities = remember(noteId, noteIdentitiesMap) { noteIdentitiesMap[noteId] ?: emptyList() }
 
     LaunchedEffect(noteId) {
         viewModel.onSelectNote(note)
+        viewModel.loadNoteIdentities(noteId)
     }
     DisposableEffect(noteId) {
-        onDispose { viewModel.onSelectNote(null) }
+        onDispose {
+            viewModel.onSelectNote(null)
+            viewModel.unloadNoteIdentities(noteId)
+        }
     }
 
     if (note != null) {
@@ -107,6 +123,11 @@ private fun DetailRoute(
             badCue, badCraving, badResponsePlan, badReward ->
             viewModel.saveHabitDesign(note.id, cue, craving, responsePlan, reward, badCue, badCraving, badResponsePlan, badReward)
         },
+        noteIdentities = noteIdentities,
+        allIdentities = allIdentities,
+        onSetNoteIdentities = { identityIds -> viewModel.setNoteIdentities(note.id, identityIds) },
+        onOpenIdentityManager = onOpenIdentityManager,
+        onNewIdentity = { name, description -> viewModel.insertIdentity(name, description) },
         onSyncToggle = { if (it) viewModel.syncCal(note) else viewModel.removeCal(note) },
         onAlarmToggle = { viewModel.toggleAlarm(note) },
         onImportClick = { onOpenImport(note.id) },

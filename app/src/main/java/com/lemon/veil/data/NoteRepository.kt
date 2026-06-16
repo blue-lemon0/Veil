@@ -26,6 +26,21 @@ interface NoteRepository {
     suspend fun mergeNotes(noteIds: List<Long>, newTitle: String): Long
     suspend fun setAsSubTasks(noteIds: List<Long>, targetId: Long)
     suspend fun promoteToRoot(noteIds: List<Long>)
+    // === Identities ===
+    fun getAllIdentities(): Flow<List<IdentityEntity>>
+    suspend fun getAllIdentitiesOnce(): List<IdentityEntity>
+    suspend fun getIdentitiesForNote(noteId: Long): List<IdentityEntity>
+    fun getIdentitiesForNoteFlow(noteId: Long): Flow<List<IdentityEntity>>
+    suspend fun getNoteCountForIdentity(identityId: Long): Int
+    suspend fun insertIdentity(identity: IdentityEntity): Long
+    suspend fun updateIdentity(identity: IdentityEntity)
+    suspend fun deleteIdentity(identityId: Long)
+    suspend fun addNoteIdentity(noteId: Long, identityId: Long)
+    suspend fun removeNoteIdentity(noteId: Long, identityId: Long)
+    suspend fun setNoteIdentities(noteId: Long, identityIds: List<Long>)
+    fun getRootNotesByIdentity(identityId: Long): Flow<List<NoteEntity>>
+    suspend fun getNoteIdsForIdentity(identityId: Long): List<Long>
+
     suspend fun updateHabitStack(noteId: Long, currentHabit: String, newHabit: String)
 
     suspend fun updateHabitDesign(
@@ -63,6 +78,28 @@ class NoteRepositoryImpl(context: Context) : NoteRepository {
     override suspend fun mergeNotes(noteIds: List<Long>, newTitle: String): Long = dao.mergeNotes(noteIds, newTitle)
     override suspend fun setAsSubTasks(noteIds: List<Long>, targetId: Long) = dao.setAsSubTasks(noteIds, targetId)
     override suspend fun promoteToRoot(noteIds: List<Long>) = dao.promoteToRoot(noteIds)
+    // === Identities ===
+    override fun getAllIdentities(): Flow<List<IdentityEntity>> = dao.getAllIdentities()
+    override suspend fun getAllIdentitiesOnce(): List<IdentityEntity> = dao.getAllIdentitiesOnce()
+    override suspend fun getIdentitiesForNote(noteId: Long): List<IdentityEntity> = dao.getIdentitiesForNote(noteId)
+    override fun getIdentitiesForNoteFlow(noteId: Long): Flow<List<IdentityEntity>> = dao.getIdentitiesForNoteFlow(noteId)
+    override suspend fun getNoteCountForIdentity(identityId: Long): Int = dao.getNoteCountForIdentity(identityId)
+    override suspend fun insertIdentity(identity: IdentityEntity): Long = dao.insertIdentity(identity)
+    override suspend fun updateIdentity(identity: IdentityEntity) = dao.updateIdentity(identity)
+    override suspend fun deleteIdentity(identityId: Long) = dao.deleteIdentity(identityId)
+    override suspend fun addNoteIdentity(noteId: Long, identityId: Long) =
+        dao.addNoteIdentity(NoteIdentityCrossRef(noteId, identityId))
+    override suspend fun removeNoteIdentity(noteId: Long, identityId: Long) =
+        dao.removeNoteIdentity(NoteIdentityCrossRef(noteId, identityId))
+    override suspend fun setNoteIdentities(noteId: Long, identityIds: List<Long>) {
+        dao.clearNoteIdentities(noteId)
+        for (id in identityIds) {
+            dao.addNoteIdentity(NoteIdentityCrossRef(noteId, id))
+        }
+    }
+    override fun getRootNotesByIdentity(identityId: Long): Flow<List<NoteEntity>> = dao.getRootNotesByIdentity(identityId)
+    override suspend fun getNoteIdsForIdentity(identityId: Long): List<Long> = dao.getNoteIdsForIdentity(identityId)
+
     override suspend fun updateHabitStack(noteId: Long, currentHabit: String, newHabit: String) =
         dao.updateHabitStack(noteId, currentHabit, newHabit)
 

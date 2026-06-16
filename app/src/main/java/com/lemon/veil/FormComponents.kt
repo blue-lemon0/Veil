@@ -145,6 +145,7 @@ fun NoteEditCard(
     onTimeClick: () -> Unit,
     location: String,
     onLocationChange: (String) -> Unit,
+    identityChips: @Composable (() -> Unit)? = null,
 ) {
     OutlinedCard(
         shape = RoundedCornerShape(12.dp),
@@ -172,6 +173,11 @@ fun NoteEditCard(
                         modifier = Modifier.size(20.dp)
                     )
                 }
+            }
+            identityChips?.let {
+                Spacer(Modifier.height(4.dp))
+                it()
+                Spacer(Modifier.height(2.dp))
             }
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {

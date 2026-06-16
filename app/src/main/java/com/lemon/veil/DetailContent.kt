@@ -1,7 +1,11 @@
 package com.lemon.veil
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +21,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -36,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.lemon.veil.data.IdentityEntity
 import com.lemon.veil.data.NoteEntity
 
 @Composable
@@ -71,6 +78,7 @@ fun SourceSections(originalText: String, suggestion: String) {
     SourceSection(stringResource(R.string.section_ai_suggestion), suggestion, showSuggestion) { showSuggestion = !showSuggestion }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DetailContent(
     note: NoteEntity,
@@ -87,6 +95,11 @@ fun DetailContent(
     onSaveHabitDesign: (cue: String, craving: String, responsePlan: String, reward: String,
                         badCue: String, badCraving: String, badResponsePlan: String, badReward: String) -> Unit,
     onSaveHabitStack: (currentHabit: String, newHabit: String) -> Unit,
+    noteIdentities: List<IdentityEntity> = emptyList(),
+    allIdentities: List<IdentityEntity> = emptyList(),
+    onSetNoteIdentities: (List<Long>) -> Unit = {},
+    onOpenIdentityManager: () -> Unit = {},
+    onNewIdentity: (name: String, description: String) -> Unit = { _, _ -> },
     onSyncToggle: (Boolean) -> Unit,
     onAlarmToggle: (Boolean) -> Unit,
     onImportClick: () -> Unit,
@@ -108,6 +121,9 @@ fun DetailContent(
 
     var currentHabit by remember(note.id) { mutableStateOf(note.currentHabit) }
     var newHabit by remember(note.id) { mutableStateOf(note.newHabit) }
+
+    var showIdentityPicker by remember { mutableStateOf(false) }
+    var showIdentityForm by remember { mutableStateOf(false) }
 
     val status = noteTimeStatus(note, null)
 
@@ -164,7 +180,58 @@ fun DetailContent(
             onTimeClick = { pickerState.pick(null) },
             location = locationText,
             onLocationChange = { locationText = it },
+            identityChips = {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    noteIdentities.forEach { identity ->
+                        AssistChip(
+                            onClick = { },
+                            label = { Text(identity.name, style = MaterialTheme.typography.labelMedium) },
+                            colors = AssistChipDefaults.assistChipColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            ),
+                            border = null,
+                        )
+                    }
+                    AssistChip(
+                        onClick = { showIdentityPicker = true },
+                        label = { Text("+", style = MaterialTheme.typography.labelMedium) },
+                        colors = AssistChipDefaults.assistChipColors(
+                            containerColor = Color.Transparent,
+                            labelColor = MaterialTheme.colorScheme.primary,
+                        ),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
+                    )
+                }
+            },
         )
+
+        if (showIdentityPicker) {
+            IdentityPickerDialog(
+                allIdentities = allIdentities,
+                selectedIds = noteIdentities.map { it.id }.toSet(),
+                onConfirm = { selectedIds ->
+                    onSetNoteIdentities(selectedIds.toList())
+                    showIdentityPicker = false
+                },
+                onDismiss = { showIdentityPicker = false },
+                onNewIdentity = { showIdentityForm = true; showIdentityPicker = false },
+            )
+        }
+
+        if (showIdentityForm) {
+            IdentityFormDialog(
+                onConfirm = { name, description ->
+                    onNewIdentity(name, description)
+                    showIdentityForm = false
+                    showIdentityPicker = true
+                },
+                onDismiss = { showIdentityForm = false; showIdentityPicker = true },
+            )
+        }
 
         Spacer(Modifier.height(12.dp))
 

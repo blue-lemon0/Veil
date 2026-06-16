@@ -3,6 +3,8 @@ package com.lemon.veil
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
@@ -23,9 +26,12 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,8 +49,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.lemon.veil.data.IdentityEntity
 import com.lemon.veil.data.NoteEntity
 
 private sealed class DisplayItem {
@@ -65,6 +73,7 @@ private sealed class DisplayItem {
 fun ListScreen(
     viewModel: MainViewModel,
     onOpenDetail: (Long) -> Unit = {},
+    onOpenIdentityManager: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val conversation by viewModel.conversation.collectAsState()
@@ -72,6 +81,8 @@ fun ListScreen(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val filteredNotes by viewModel.filteredNotes.collectAsState()
     val expandedSteps by viewModel.expandedSteps.collectAsState()
+    val allIdentities by viewModel.allIdentities.collectAsState()
+    val selectedIdentityId by viewModel.selectedIdentityFilter.collectAsState()
 
     var showSheet by remember { mutableStateOf(false) }
     var pendingDelete by remember { mutableStateOf<NoteEntity?>(null) }
@@ -122,6 +133,12 @@ fun ListScreen(
                     SearchBar(
                         query = searchQuery,
                         onQueryChange = viewModel::setSearchQuery
+                    )
+                    IdentityFilterBar(
+                        identities = allIdentities,
+                        selectedId = selectedIdentityId,
+                        onSelect = viewModel::setIdentityFilter,
+                        onManage = onOpenIdentityManager,
                     )
                 }
             },
@@ -280,6 +297,72 @@ private fun SearchBar(
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun IdentityFilterBar(
+    identities: List<IdentityEntity>,
+    selectedId: Long?,
+    onSelect: (Long?) -> Unit,
+    onManage: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 12.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        FilterChip(
+            selected = selectedId == null,
+            onClick = { onSelect(null) },
+            label = { Text(stringResource(R.string.filter_all), style = MaterialTheme.typography.labelMedium) },
+            colors = FilterChipDefaults.filterChipColors(
+                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                containerColor = Color.Transparent,
+                labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            ),
+            border = FilterChipDefaults.filterChipBorder(
+                enabled = true,
+                selected = selectedId == null,
+                borderColor = MaterialTheme.colorScheme.outline,
+                selectedBorderColor = MaterialTheme.colorScheme.primary,
+            ),
+            shape = RoundedCornerShape(50),
+            modifier = Modifier.height(28.dp),
+        )
+        identities.forEach { identity ->
+            FilterChip(
+                selected = identity.id == selectedId,
+                onClick = { onSelect(identity.id) },
+                label = { Text(identity.name, style = MaterialTheme.typography.labelMedium) },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    containerColor = Color.Transparent,
+                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = identity.id == selectedId,
+                    borderColor = MaterialTheme.colorScheme.outline,
+                    selectedBorderColor = MaterialTheme.colorScheme.primary,
+                ),
+                shape = RoundedCornerShape(50),
+                modifier = Modifier.height(28.dp),
+            )
+        }
+        IconButton(onClick = onManage, modifier = Modifier.size(28.dp)) {
+            Icon(
+                Icons.Default.Settings,
+                contentDescription = stringResource(R.string.title_identity_manager),
+                modifier = Modifier.size(16.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 

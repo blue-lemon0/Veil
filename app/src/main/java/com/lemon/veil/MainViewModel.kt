@@ -13,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import com.lemon.veil.ai.AiRepository
 import com.lemon.veil.ai.AiRepositoryImpl
 import com.lemon.veil.ai.ChatMessage
+import com.lemon.veil.data.IdentityEntity
 import com.lemon.veil.data.NoteEntity
 import com.lemon.veil.data.NoteRepository
 import com.lemon.veil.data.NoteRepositoryImpl
@@ -25,6 +26,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -67,7 +71,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
-    val filteredNotes = combine(notes, _searchQuery, noteRepository.getAllNotes()) { rootNotes, query, allNotes ->
+    private val _selectedIdentityFilter = MutableStateFlow<Long?>(null)
+    val selectedIdentityFilter: StateFlow<Long?> = _selectedIdentityFilter.asStateFlow()
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    private val _identityFilteredNoteIds = _selectedIdentityFilter
+        .flatMapLatest { identityId: Long? ->
+            if (identityId == null) flowOf<Set<Long>?>(null)
+            else noteRepository.getRootNotesByIdentity(identityId)
+                .map { notes -> notes.map { it.id }.toSet() }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    private val _searchFilteredNotes = combine(notes, _searchQuery, noteRepository.getAllNotes()) { rootNotes, query, allNotes ->
         if (query.isBlank()) return@combine rootNotes
         val q = query.lowercase()
         val matchingParentIds = allNotes
@@ -86,6 +102,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             note.location.lowercase().contains(q) ||
             note.id in matchingParentIds
         }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val filteredNotes = combine(_searchFilteredNotes, _identityFilteredNoteIds) { rootNotes, noteIds ->
+        if (noteIds == null) rootNotes
+        else rootNotes.filter { it.id in noteIds }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun setSearchQuery(query: String) { _searchQuery.value = query }
@@ -323,6 +344,64 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun saveHabitStack(noteId: Long, currentHabit: String, newHabit: String) {
         viewModelScope.launch {
             noteRepository.updateHabitStack(noteId, currentHabit, newHabit)
+        }
+    }
+
+    // === Identities ===
+    val allIdentities: StateFlow<List<IdentityEntity>> = noteRepository.getAllIdentities()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    private val _noteIdentities = MutableStateFlow<Map<Long, List<IdentityEntity>>>(emptyMap())
+    val noteIdentities: StateFlow<Map<Long, List<IdentityEntity>>> = _noteIdentities.asStateFlow()
+
+    private val _noteIdentityJobs = mutableMapOf<Long, Job>()
+
+    fun loadNoteIdentities(noteId: Long) {
+        _noteIdentityJobs[noteId]?.cancel()
+        _noteIdentityJobs[noteId] = viewModelScope.launch {
+            noteRepository.getIdentitiesForNoteFlow(noteId).collect { identities ->
+                _noteIdentities.value = _noteIdentities.value + (noteId to identities)
+            }
+        }
+    }
+
+    fun unloadNoteIdentities(noteId: Long) {
+        _noteIdentityJobs[noteId]?.cancel()
+        _noteIdentityJobs.remove(noteId)
+        _noteIdentities.value = _noteIdentities.value - noteId
+    }
+
+    suspend fun getNoteCountForIdentity(identityId: Long): Int =
+        noteRepository.getNoteCountForIdentity(identityId)
+
+    fun setNoteIdentities(noteId: Long, identityIds: List<Long>) {
+        viewModelScope.launch {
+            noteRepository.setNoteIdentities(noteId, identityIds)
+        }
+    }
+
+    fun setIdentityFilter(identityId: Long?) {
+        _selectedIdentityFilter.value = identityId
+    }
+
+    fun insertIdentity(name: String, description: String) {
+        viewModelScope.launch {
+            noteRepository.insertIdentity(IdentityEntity(name = name, description = description))
+        }
+    }
+
+    fun updateIdentity(identity: IdentityEntity) {
+        viewModelScope.launch {
+            noteRepository.updateIdentity(identity)
+        }
+    }
+
+    fun deleteIdentity(identityId: Long) {
+        viewModelScope.launch {
+            noteRepository.deleteIdentity(identityId)
+            if (_selectedIdentityFilter.value == identityId) {
+                _selectedIdentityFilter.value = null
+            }
         }
     }
 

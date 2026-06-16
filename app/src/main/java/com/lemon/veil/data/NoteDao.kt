@@ -104,4 +104,44 @@ interface NoteDao {
         val count = getStepCount(targetId)
         noteIds.forEachIndexed { index, id -> updateNoteParent(id, targetId, count + index) }
     }
+
+    // === Identities ===
+    @Query("SELECT * FROM identities ORDER BY name ASC")
+    fun getAllIdentities(): Flow<List<IdentityEntity>>
+
+    @Query("SELECT * FROM identities ORDER BY name ASC")
+    suspend fun getAllIdentitiesOnce(): List<IdentityEntity>
+
+    @Query("SELECT i.* FROM identities i INNER JOIN note_identities ni ON i.id = ni.identityId WHERE ni.noteId = :noteId ORDER BY i.name ASC")
+    suspend fun getIdentitiesForNote(noteId: Long): List<IdentityEntity>
+
+    @Query("SELECT i.* FROM identities i INNER JOIN note_identities ni ON i.id = ni.identityId WHERE ni.noteId = :noteId ORDER BY i.name ASC")
+    fun getIdentitiesForNoteFlow(noteId: Long): Flow<List<IdentityEntity>>
+
+    @Query("SELECT COUNT(*) FROM note_identities WHERE identityId = :identityId")
+    suspend fun getNoteCountForIdentity(identityId: Long): Int
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIdentity(identity: IdentityEntity): Long
+
+    @Update
+    suspend fun updateIdentity(identity: IdentityEntity)
+
+    @Query("DELETE FROM identities WHERE id = :identityId")
+    suspend fun deleteIdentity(identityId: Long)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun addNoteIdentity(crossRef: NoteIdentityCrossRef)
+
+    @Delete
+    suspend fun removeNoteIdentity(crossRef: NoteIdentityCrossRef)
+
+    @Query("DELETE FROM note_identities WHERE noteId = :noteId")
+    suspend fun clearNoteIdentities(noteId: Long)
+
+    @Query("SELECT DISTINCT n.* FROM notes n INNER JOIN note_identities ni ON n.id = ni.noteId WHERE ni.identityId = :identityId AND n.parentId IS NULL")
+    fun getRootNotesByIdentity(identityId: Long): Flow<List<NoteEntity>>
+
+    @Query("SELECT noteId FROM note_identities WHERE identityId = :identityId")
+    suspend fun getNoteIdsForIdentity(identityId: Long): List<Long>
 }
