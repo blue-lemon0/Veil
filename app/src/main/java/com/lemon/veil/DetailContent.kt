@@ -21,14 +21,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -186,25 +185,31 @@ fun DetailContent(
                     verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
                     noteIdentities.forEach { identity ->
-                        AssistChip(
-                            onClick = { },
-                            label = { Text(identity.name, style = MaterialTheme.typography.labelMedium) },
-                            colors = AssistChipDefaults.assistChipColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                            ),
-                            border = null,
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                        ) {
+                            Text(
+                                identity.name,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            )
+                        }
+                    }
+                    Surface(
+                        modifier = Modifier.clickable { showIdentityPicker = true },
+                        shape = RoundedCornerShape(6.dp),
+                        color = Color.Transparent,
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
+                    ) {
+                        Text(
+                            "+",
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
-                    AssistChip(
-                        onClick = { showIdentityPicker = true },
-                        label = { Text("+", style = MaterialTheme.typography.labelMedium) },
-                        colors = AssistChipDefaults.assistChipColors(
-                            containerColor = Color.Transparent,
-                            labelColor = MaterialTheme.colorScheme.primary,
-                        ),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
-                    )
                 }
             },
         )

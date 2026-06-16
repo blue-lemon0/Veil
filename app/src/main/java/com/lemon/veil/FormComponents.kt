@@ -175,9 +175,8 @@ fun NoteEditCard(
                 }
             }
             identityChips?.let {
-                Spacer(Modifier.height(4.dp))
                 it()
-                Spacer(Modifier.height(2.dp))
+                Spacer(Modifier.height(4.dp))
             }
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
