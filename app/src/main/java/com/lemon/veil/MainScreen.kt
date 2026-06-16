@@ -3,6 +3,7 @@ package com.lemon.veil
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,8 +48,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -308,6 +314,12 @@ private fun IdentityFilterBar(
     onManage: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var cardWidth by remember { mutableStateOf(0.dp) }
+    val density = LocalDensity.current
+    val chevronRotation by animateFloatAsState(
+        targetValue = if (expanded) 180f else 0f,
+        animationSpec = tween(durationMillis = 200),
+    )
     val selectedName = if (selectedId == null) null
         else identities.find { it.id == selectedId }?.name
 
@@ -328,13 +340,14 @@ private fun IdentityFilterBar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(32.dp)
+                    .onSizeChanged { cardWidth = with(density) { it.width.toDp() } }
                     .clickable { expanded = true },
                 shape = RoundedCornerShape(8.dp),
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 10.dp),
+                        .padding(start = 10.dp, end = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
@@ -359,11 +372,30 @@ private fun IdentityFilterBar(
                             )
                         }
                     }
+                    Icon(
+                        Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(18.dp)
+                            .rotate(chevronRotation),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    )
                 }
             }
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
+                modifier = Modifier
+                    .width(cardWidth)
+                    .background(
+                        MaterialTheme.colorScheme.surface,
+                        RoundedCornerShape(8.dp)
+                    )
+                    .border(
+                        1.dp,
+                        MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                        RoundedCornerShape(8.dp)
+                    ),
             ) {
                 DropdownMenuItem(
                     text = {
